@@ -6,12 +6,28 @@
   let loading = $state(false);
   let error = $state(false);
 
+  let handleSubmit = async () => {
+    loading = true;
+    error = false;
+    answer = "";
+
+    // test code to be replaced
+    setTimeout(() => {
+      loading = false;
+      if(new Date().getSeconds() < 40) {
+        answer = "This will be a generated text";
+      } else {
+        error = true;
+      }
+    }, 2000);
+  }
 </script>
 
 <div class="max-w-3xl mx-auto">
   <h1 class="text-2xl text-teal-900 my-8 text-center">Explain It Like I'm Five</h1>
 
-  <form class="grid grid-cols-1 justify-items-center w-full border border-slate-300 rounded-md">
+  <form class="grid grid-cols-1 justify-items-center w-full border border-slate-300 rounded-md"
+        on:submit|preventDefault={() => handleSubmit()}>
 
     <label for="context" class="text-lg text-center mt-4 text-teal-900">Enter the text you want summarized/explained</label>
 
