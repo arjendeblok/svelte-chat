@@ -25,6 +25,7 @@
   },
   "type": "module",
   "dependencies": {
-    "@azure/openai": "1.0.0-beta.11"
+    "@azure/openai": "1.0.0-beta.11",
+    "sse.js": "^2.4.1"
   }
 }
