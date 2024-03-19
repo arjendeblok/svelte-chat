@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { SSE } from "sse.js";
   import { fade } from "svelte/transition";
 
   let context = $state("");
@@ -11,16 +12,44 @@
     error = false;
     answer = "";
 
-    // test code to be replaced
-    setTimeout(() => {
+    const eventSource = new SSE("/api/explain", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      payload: JSON.stringify({ context }),
+    });
+
+    eventSource.addEventListener("error", () => {
+      error = true;
       loading = false;
-      if(new Date().getSeconds() < 40) {
-        answer = "This will be a generated text";
-      } else {
+    });
+
+    eventSource.addEventListener("message", (m: any) => {
+      try {
+        if (m.data === "[DONE]") {
+          return;
+        }
+
+        const completionResponse: any = JSON.parse(m.data);       
+        if(completionResponse.choices.length > 0) {       
+          const choice = completionResponse.choices[0];
+          if(choice && choice.delta && choice.delta.content) {
+            answer = (answer ?? "") + choice.delta.content;
+          }
+        }
+
+        if(answer != "") {
+          loading = false;
+        }
+      } catch (err) {
         error = true;
+        loading = false;
+        console.error(err);
       }
-    }, 2000);
-  }
+    });
+
+    eventSource.stream();
+  };
 </script>
 
 <div class="max-w-3xl mx-auto">
